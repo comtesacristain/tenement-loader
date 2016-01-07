@@ -154,7 +154,14 @@ public class ShapefileReader {
 		System.out.println(path);
 		File shapefile = new File(path + ".shp");
 		if (shapefile.exists()) {
-			return shapefile;
+			path = path + "_" + String.format("%02d", date.minusYears(1).getYear() % 100);
+			
+
+			if (new File(path + ".shp").exists()) {
+				return findShapefilePath(date, state);
+			} else {
+				return shapefile;
+			}
 		} else {
 			path = path + "_" + String.format("%02d", date.getYear() % 100);
 			System.out.println(path);
@@ -162,6 +169,7 @@ public class ShapefileReader {
 			if (shapefile.exists()) {
 				return shapefile;
 			}
+			
 		}
 		date = date.minusMonths(1);
 		return findShapefilePath(date, state);
@@ -250,7 +258,7 @@ public class ShapefileReader {
 	 */
 	private static Map<Serializable, Object> oracleParams() {
 		Map<Serializable, Object> parameters = new HashMap<Serializable, Object>();
-		
+
 		return parameters;
 	}
 
