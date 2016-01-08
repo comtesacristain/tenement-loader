@@ -23,7 +23,6 @@ import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.filter.text.cql2.CQL;
 import org.geotools.filter.text.cql2.CQLException;
-import org.geotools.jdbc.JDBCDataStoreFactory;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
@@ -151,20 +150,20 @@ public class ShapefileReader {
 		}
 		int month = date.getMonthValue();
 		String path = shapefileDir + state.toString().toLowerCase() + "_tenement_" + String.format("%02d", month);
-		System.out.println(path);
 		File shapefile = new File(path + ".shp");
+		System.out.println("Searching inital path: " + path);
 		if (shapefile.exists()) {
-			path = path + "_" + String.format("%02d", date.minusYears(1).getYear() % 100);
+			System.out.println("Shapefile found!");
 			
-
-			if (new File(path + ".shp").exists()) {
-				return findShapefilePath(date, state);
-			} else {
+			String newPath =  path + "_" +  date.minusYears(1).getYear();
+			System.out.println("Checking if this is current of last years");
+			System.out.println("Does the following path exist? " + newPath);
+			if (new File(newPath + ".shp").exists()) {
 				return shapefile;
 			}
 		} else {
-			path = path + "_" + String.format("%02d", date.getYear() % 100);
-			System.out.println(path);
+			System.out.println("Shapefile not found!");
+			path = path + "_" + date.getYear();
 			shapefile = new File(path + ".shp");
 			if (shapefile.exists()) {
 				return shapefile;
@@ -207,7 +206,6 @@ public class ShapefileReader {
 	 */
 	private LocalDate shapefileDate() {
 		int year;
-		// LocalDate date = LocalDate.now();
 		String[] fileComponents = shapefileNameComponents();
 		int month = Integer.parseInt(fileComponents[2]);
 		if (fileComponents.length > 3) {
@@ -216,7 +214,8 @@ public class ShapefileReader {
 			year = returnYearFromMonth(month);
 		}
 		YearMonth yearMonth = YearMonth.of(year, month);
-		LocalDate date = yearMonth.atEndOfMonth();
+		LocalDate date = yearMonth.atDay(1);
+
 		return date;
 	}
 
@@ -226,7 +225,7 @@ public class ShapefileReader {
 	 */
 	private int returnYearFromMonth(int month) {
 		LocalDate monthDate = LocalDate.now().withMonth(month);
-		if (monthDate.isBefore(LocalDate.now())) {
+		if  (monthDate.isBefore(LocalDate.now()) || monthDate.isEqual(LocalDate.now())) {
 			return monthDate.getYear();
 		} else {
 			return monthDate.getYear() - 1;
@@ -258,7 +257,7 @@ public class ShapefileReader {
 	 */
 	private static Map<Serializable, Object> oracleParams() {
 		Map<Serializable, Object> parameters = new HashMap<Serializable, Object>();
-
+		
 		return parameters;
 	}
 
