@@ -2,12 +2,14 @@ package au.gov.ga.geoportal;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 
 import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFinder;
@@ -32,6 +34,7 @@ import org.opengis.filter.Filter;
  * @author michael
  *
  */
+
 public class ShapefileReader {
 
 	/**
@@ -83,7 +86,7 @@ public class ShapefileReader {
 	}
 
 	private DataStore oracleDataStore() throws IOException {
-		Map<Serializable, Object> params = oracleParams();
+		Properties params = oracleParams();
 		DataStore oracleDataStore = DataStoreFinder.getDataStore(params);
 		return oracleDataStore;
 	}
@@ -254,11 +257,15 @@ public class ShapefileReader {
 
 	/**
 	 * @return The parameters for connecting to Oracle.
+	 * @throws IOException 
 	 */
-	private static Map<Serializable, Object> oracleParams() {
-		Map<Serializable, Object> parameters = new HashMap<Serializable, Object>();
-		
-		return parameters;
+	private static Properties oracleParams() throws IOException {
+		InputStream inputStream;
+		Properties properties = new Properties();
+		String propertyFilename = "persistence.properties";
+		inputStream = ShapefileReader.class.getClassLoader().getResourceAsStream(propertyFilename);
+		properties.load(inputStream);
+		return properties;
 	}
 
 }
