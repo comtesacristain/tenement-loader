@@ -1,5 +1,7 @@
-/target/
-/nsw_tenement_12.dbf
-/nsw_tenement_12.prj
-/nsw_tenement_12.shp
-/nsw_tenement_12.shx
+target
+*.shp
+*.shx
+*.prj
+*.dbf
+src/main/resources/persistence.properties
+src/main/resources/gispath.properties
