@@ -1,0 +1,28 @@
+<tenement-status>
+	<qld>
+		<mapping>
+			<source>Granted</source>
+			<target>granted</target>
+		</mapping>
+		<mapping>
+			<source>Application</source>
+			<target>application</target>
+		</mapping>
+	</qld>
+	<nsw>
+		<mapping>
+			<source>LIVE</source>
+			<target>live</target>
+		</mapping>
+		<mapping>
+			<source>PENDING</source>
+			<target>pending</target>
+		</mapping>
+	</nsw>
+	<nt>
+		<mapping>
+			<source>grant</source>
+			<target>granted</target>
+		</mapping>
+	</nt>
+</tenement-status>

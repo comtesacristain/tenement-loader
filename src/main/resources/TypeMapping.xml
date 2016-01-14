@@ -1,0 +1,36 @@
+<tenement-type>
+	<qld>
+		<mapping>
+			<source>ML</source>
+			<target>mining lease</target>
+		</mapping>
+		<mapping>
+			<source>EPC</source>
+			<target>exploration permit for coal</target>
+		</mapping>
+		<mapping>
+			<source>EPM</source>
+			<target>exploration permit for minerals</target>
+		</mapping>
+	</qld>
+	<nsw>
+		<mapping>
+			<source>Assessment lease</source>
+			<target>assessment lease</target>
+		</mapping>
+		<mapping>
+			<source>Exploration licence</source>
+			<target>exploration licence</target>
+		</mapping>
+		<mapping>
+			<source>Mining lease</source>
+			<target>mining lease</target>
+		</mapping>
+	</nsw>
+	<nt>
+		<mapping>
+			<source>EL</source>
+			<target>exploration licence</target>
+		</mapping>
+	</nt>
+</tenement-type>
