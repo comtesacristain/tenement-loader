@@ -179,7 +179,7 @@ public class ShapefileReader {
 	}
 
 	/**
-	 * @return
+	 * @return Boolean on whether data already exists for the given shapefile in Oracle
 	 * @throws IOException
 	 * @throws CQLException
 	 */
