@@ -5,12 +5,15 @@ import java.io.IOException;
 
 import java.io.InputStream;
 import java.io.Serializable;
+import java.net.URL;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
+
+import javax.xml.parsers.ParserConfigurationException;
 
 import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFinder;
@@ -30,6 +33,7 @@ import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.filter.Filter;
+import org.xml.sax.SAXException;
 
 /**
  * @author michael
@@ -37,7 +41,14 @@ import org.opengis.filter.Filter;
  */
 
 public class ShapefileReader {
+	private static String typeMappingFilename = "TypeMapping.xml"; // TODO
+																	// doesn't
+																	// need
+	// to be static;
+	private static String statusMappingFilename = "StatusMapping.xml";
 
+	private Map<String, String> typeMapping;
+	private Map<String, String> statusMapping;
 	/**
 	 * 
 	 */
@@ -58,8 +69,12 @@ public class ShapefileReader {
 
 	/**
 	 * @param args
+	 * @throws ParserConfigurationException
+	 * @throws IOException
+	 * @throws SAXException
 	 */
-	public static void main(String[] args) {
+	public static void main(String[] args) throws SAXException, IOException, ParserConfigurationException {
+
 		for (States state : States.values()) {
 			File shapefile = findShapefilePath(LocalDate.now(), state);
 			if (shapefile.exists()) {
@@ -77,6 +92,7 @@ public class ShapefileReader {
 
 			}
 		}
+
 	}
 
 	/**
@@ -128,18 +144,51 @@ public class ShapefileReader {
 				SimpleFeature source = (SimpleFeature) shapefileFeatures.next();
 
 				for (AttributeDescriptor attributeDescriptor : tenementsSchema.getAttributeDescriptors()) {
-					String attribute = attributeDescriptor.getLocalName();
-					builder.set(attribute.toUpperCase(), source.getAttribute(attribute));
-					builder.set("GEOM", source.getDefaultGeometry());
-					builder.set("STATE", state());
-					builder.set("RECORDDATE", shapefileDate().format(DateTimeFormatter.ISO_DATE));
-				}
 
+					String attribute = attributeDescriptor.getLocalName();
+					switch (attribute) {
+					case "STATUS":
+						String status = (String) source.getAttribute(attribute);
+						if (statusMapping.containsKey(status)) {
+							builder.set(attribute.toUpperCase(), statusMapping.get(status));
+						}
+					case "TYPE":
+						String type = (String) source.getAttribute(attribute);
+						if (typeMapping.containsKey(type)) {
+							builder.set(attribute.toUpperCase(), typeMapping.get(type));
+						}
+					default:
+						builder.set(attribute.toUpperCase(), source.getAttribute(attribute));
+					}
+
+				}
+				builder.set("GEOM", source.getDefaultGeometry());
+				builder.set("STATE", state());
+				builder.set("RECORDDATE", shapefileDate().format(DateTimeFormatter.ISO_DATE));
 				oracleFeatureStore.addFeatures(DataUtilities.collection(builder.buildFeature(null)));
 			}
 			transaction.commit();
 			transaction.close();
 		}
+
+	}
+
+	public void setTypeMapping(String state) throws SAXException, IOException, ParserConfigurationException {
+		this.typeMapping = retrieveMapping(typeMappingFilename, state);
+	}
+
+	public void setStatusMapping(String state) throws SAXException, IOException, ParserConfigurationException {
+		this.statusMapping = retrieveMapping(statusMappingFilename, state);
+	}
+
+	public Map<String, String> retrieveMapping(String filename, String state)
+			throws SAXException, IOException, ParserConfigurationException {
+		ClassLoader classLoader = ShapefileReader.class.getClassLoader();
+		URL path = classLoader.getResource(filename);
+		TenementMapping typeMapping = new TenementMapping(path.getFile());
+		Map<String, Map<?, ?>> map = typeMapping.getMapping();
+		Map<String, String> stateMapping = (Map<String, String>) map.get(state);
+		return stateMapping;
 
 	}
 
@@ -158,8 +207,8 @@ public class ShapefileReader {
 		System.out.println("Searching inital path: " + path);
 		if (shapefile.exists()) {
 			System.out.println("Shapefile found!");
-			
-			String newPath =  path + "_" +  date.minusYears(1).getYear();
+
+			String newPath = path + "_" + date.minusYears(1).getYear();
 			System.out.println("Checking if this is current of last years");
 			System.out.println("Does the following path exist? " + newPath);
 			if (new File(newPath + ".shp").exists()) {
@@ -172,14 +221,15 @@ public class ShapefileReader {
 			if (shapefile.exists()) {
 				return shapefile;
 			}
-			
+
 		}
 		date = date.minusMonths(1);
 		return findShapefilePath(date, state);
 	}
 
 	/**
-	 * @return Boolean on whether data already exists for the given shapefile in Oracle
+	 * @return Boolean on whether data already exists for the given shapefile in
+	 *         Oracle
 	 * @throws IOException
 	 * @throws CQLException
 	 */
@@ -194,7 +244,7 @@ public class ShapefileReader {
 		// Filter stateFilter = CQL.toFilter("STATE = '" + state + "'");
 		// Filter dateFilter = CQL.toFilter("RECORDDATE = '" +
 		// date.format(formatter) + "'");
-		
+
 		Filter filter = CQL.toFilter("STATE = '" + state + "' AND RECORDDATE = '" + date + "'");
 		// Query query = new Query(tenementsTypeName, filter);
 		SimpleFeatureCollection features = oracleFeatureSource.getFeatures(filter);
@@ -229,7 +279,7 @@ public class ShapefileReader {
 	 */
 	private int returnYearFromMonth(int month) {
 		LocalDate monthDate = LocalDate.now().withMonth(month);
-		if  (monthDate.isBefore(LocalDate.now()) || monthDate.isEqual(LocalDate.now())) {
+		if (monthDate.isBefore(LocalDate.now()) || monthDate.isEqual(LocalDate.now())) {
 			return monthDate.getYear();
 		} else {
 			return monthDate.getYear() - 1;
@@ -258,7 +308,7 @@ public class ShapefileReader {
 
 	/**
 	 * @return The parameters for connecting to Oracle.
-	 * @throws IOException 
+	 * @throws IOException
 	 */
 	private static Properties oracleParams() throws IOException {
 		InputStream inputStream;
