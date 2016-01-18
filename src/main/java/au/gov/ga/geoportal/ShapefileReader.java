@@ -41,14 +41,13 @@ import org.xml.sax.SAXException;
  */
 
 public class ShapefileReader {
-	private static String typeMappingFilename = "TypeMapping.xml"; // TODO
-																	// doesn't
-																	// need
-	// to be static;
-	private static String statusMappingFilename = "StatusMapping.xml";
+	
+	private static String partialMappingFilename = "TenementMapping.xml";
+	
 
-	private Map<String, String> typeMapping;
-	private Map<String, String> statusMapping;
+
+	private Map<String, Field> tenementMapping;
+
 	/**
 	 * 
 	 */
@@ -101,8 +100,7 @@ public class ShapefileReader {
 	public ShapefileReader(File shapefile) {
 		this.shapefile = shapefile;
 		try {
-			setTypeMapping(state().toLowerCase());
-			setStatusMapping(state().toLowerCase());
+			setTenementMapping();
 		} catch (SAXException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -125,6 +123,8 @@ public class ShapefileReader {
 	public void loadToOracle() throws IOException, CQLException {
 		if (dataExists()) {
 			System.out.println("Hello there is already data for " + shapefilePrefix());
+			
+			
 		} else {
 
 			SimpleFeatureType tenementsSchema = oracleDataStore().getSchema("TENEMENTS");
@@ -194,28 +194,38 @@ public class ShapefileReader {
 
 	}
 
-	public void setTypeMapping(String state) throws SAXException, IOException, ParserConfigurationException {
-		System.out.println("TYPE MAPPING");
-		typeMapping = retrieveMapping(typeMappingFilename, state);
-		System.out.println(typeMapping);
-	}
-
-	public void setStatusMapping(String state) throws SAXException, IOException, ParserConfigurationException {
-		statusMapping = retrieveMapping(statusMappingFilename, state);
-	}
-
-	public Map<String, String> retrieveMapping(String filename, String state)
-			throws SAXException, IOException, ParserConfigurationException {
+	public void setTenementMapping() throws SAXException, IOException, ParserConfigurationException {
+		String state = state();
+		String mappingFilename = state + partialMappingFilename.toUpperCase();
 		ClassLoader classLoader = ShapefileReader.class.getClassLoader();
-		URL path = classLoader.getResource(filename);
-		TenementMapping typeMapping = new TenementMapping(path.getFile());
-		System.out.println(path);
-		Map<String, Map<?, ?>> map = typeMapping.getMapping();
-		Map<String, String> stateMapping = (Map<String, String>) map.get(state);
-		System.out.println(state);
-		return stateMapping;
-
+		TenementMapping typeMapping = new TenementMapping(classLoader.getResource(mappingFilename).getFile());
+		tenementMapping = typeMapping.getMapping();
 	}
+	
+	 
+	
+//	public void setTypeMapping(String state) throws SAXException, IOException, ParserConfigurationException {
+//		System.out.println("TYPE MAPPING");
+//		typeMapping = retrieveMapping(typeMappingFilename, state);
+//		System.out.println(typeMapping);
+//	}
+//
+//	public void setStatusMapping(String state) throws SAXException, IOException, ParserConfigurationException {
+//		statusMapping = retrieveMapping(statusMappingFilename, state);
+//	}
+
+//	public Map<String, String> retrieveMapping(String filename, String state)
+//			throws SAXException, IOException, ParserConfigurationException {
+//		ClassLoader classLoader = ShapefileReader.class.getClassLoader();
+//		URL path = classLoader.getResource(filename);
+//		TenementMapping typeMapping = new TenementMapping(path.getFile());
+//		System.out.println(path);
+//		Map<String, Map<?, ?>> map = typeMapping.getMapping();
+//		Map<String, String> stateMapping = (Map<String, String>) map.get(state);
+//		System.out.println(state);
+//		return stateMapping;
+//
+//	}
 
 	/**
 	 * @param date
