@@ -1,0 +1,57 @@
+<tenement-mapping state="NSW">
+	<field target="name" source="TENID" type="string" />
+	<field target="tenementType" source="TYPE" type="vocabulary">
+		<mappings>
+			<mapping>
+				<source>Assessment lease</source>
+				<target>assessment lease</target>
+			</mapping>
+			<mapping>
+				<source>Exploration licence</source>
+				<target>exploration licence</target>
+			</mapping>
+			<mapping>
+				<source>Mining lease</source>
+				<target>mining lease</target>
+			</mapping>
+		</mappings>
+	</field>
+	<field target="owner">
+		<source>OWNER</source>
+		<type>string</type>
+	</field>
+	<field target="status">
+		<source>TENSTATUS</source>
+		<type>vocabulary</type>
+		<mappings>
+			<mapping>
+				<source>LIVE</source>
+				<target>live</target>
+			</mapping>
+			<mapping>
+				<source>PENDING</source>
+				<target>pending</target>
+			</mapping>
+		</mappings>
+	</field>
+	<field target="area">
+		<source>AREA</source>
+		<type>string</type>
+	</field>
+	<field target="applicationDate">
+		<source>APPDATE</source>
+		<type format="yyyyMMdd">date</type>
+	</field>
+	<field target="grantDate">
+		<source>GRANTDATE</source>
+		<type format="yyyyMMdd">date</type>
+	</field>
+	<field target="expireDate">
+		<source>EXPIREDATE</source>
+		<type format="yyyyMMdd">date</type>
+	</field>
+	<field target="shape">
+		<source>the_geom</source>
+		<type>geometry</type>
+	</field>
+</tenement-mapping>
