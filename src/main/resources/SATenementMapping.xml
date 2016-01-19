@@ -1,0 +1,35 @@
+<tenement-mapping state="SA">
+	<field target="name" source="TENID" type="string" />
+	<field target="tenementType" source="TYPE" type="vocabulary">
+		<mappings>
+			<mapping>
+				<source>EL</source>
+				<target>exploration licence</target>
+			</mapping>
+			<mapping>
+				<source>ELA</source>
+				<target>exploration licence application</target>
+			</mapping>
+		</mappings>
+	</field>
+	<field target="owner" source="OWNER" type="string" />
+	<field target="status" source="TENSTATUS" type="vocabulary">
+		<mappings>
+			<mapping>
+				<source>live</source>
+				<target>live</target>
+			</mapping>
+			<mapping>
+				<source>pending</source>
+				<target>pending</target>
+			</mapping>
+		</mappings>
+	</field>
+	<field target="area" source="AREA" type="string" />
+	<field target="applicationDate" source="APPDATE" type="date"
+		format="yyyy-MM-dd" />
+	<field target="grantDate" source="GRANTDATE" type="date" format="yyyy-MM-dd" />
+	<field target="expireDate" source="EXPIREDATE" type="date"
+		format="yyyy-MM-dd" />
+	<field target="geom" source="the_geom" type="geometry" />
+</tenement-mapping>
