@@ -1,6 +1,6 @@
 package au.gov.ga.geoportal;
 
-import java.util.List;
+import java.util.Map;
 
 public class Field {
 
@@ -8,8 +8,10 @@ public class Field {
 	private String type;
 	private String format =null;
 	private String target;
-	private List<Mapping> mappings;
 
+
+	private Map<String, String> mappings;
+	
 	public String getSource() {
 		return source;
 	}
@@ -22,7 +24,7 @@ public class Field {
 		return target;
 	}
 
-	public List<Mapping> getMappings() {
+	public Map<String, String> getMappings() {
 		return mappings;
 	}
 
@@ -38,7 +40,7 @@ public class Field {
 		this.target = target;
 	}
 
-	public void setMappings(List<Mapping> mappings) {
+	public void setMappings(Map<String, String> mappings) {
 		this.mappings = mappings;
 	}
 
