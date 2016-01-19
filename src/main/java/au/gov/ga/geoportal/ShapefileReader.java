@@ -3,10 +3,8 @@ package au.gov.ga.geoportal;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.time.Instant;
 import java.time.LocalDate;
 import java.time.YearMonth;
-import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.HashMap;
@@ -183,7 +181,7 @@ public class ShapefileReader {
 							builder.set(attribute.toUpperCase(), attributeValue);
 						} else if (attributeValue instanceof String) {
 							String dateString = (String) attributeValue;
-							System.out.println(dateString);
+							
 							if (!dateString.isEmpty() && !dateString.equals("No Date Available")) {
 
 								String dateFormatString = attributeMapping.getFormat();
