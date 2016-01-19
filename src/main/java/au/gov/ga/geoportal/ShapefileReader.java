@@ -41,10 +41,8 @@ import org.xml.sax.SAXException;
  */
 
 public class ShapefileReader {
-	
-	private static String partialMappingFilename = "TenementMapping.xml";
-	
 
+	private static String partialMappingFilename = "TenementMapping.xml";
 
 	private Map<String, Field> tenementMapping;
 
@@ -123,8 +121,7 @@ public class ShapefileReader {
 	public void loadToOracle() throws IOException, CQLException {
 		if (dataExists()) {
 			System.out.println("Hello there is already data for " + shapefilePrefix());
-			
-			
+
 		} else {
 
 			SimpleFeatureType tenementsSchema = oracleDataStore().getSchema("TENEMENTS");
@@ -160,27 +157,43 @@ public class ShapefileReader {
 				for (AttributeDescriptor attributeDescriptor : tenementsSchema.getAttributeDescriptors()) {
 
 					String attribute = attributeDescriptor.getLocalName();
-					
-					switch (attribute) {
-					case "STATUS":
-						String status = (String) source.getAttribute("TENSTATUS");
-						if (statusMapping.containsKey(status)) {
-							builder.set(attribute.toUpperCase(), statusMapping.get(status));
-						}
+
+					Field attributeMapping = tenementMapping.get(attribute);
+
+					String attributeType = attributeMapping.getType();
+
+					switch (attributeType) {
+					case "string":
+						builder.set(attribute.toUpperCase(), source.getAttribute(attributeMapping.getSource()));
 						break;
-					case "TYPE":
-						String type = (String) source.getAttribute(attribute);
-						
-						if (typeMapping.containsKey(type)) {
-							builder.set(attribute.toUpperCase(), typeMapping.get(type));
-						} else {
-							builder.set(attribute.toUpperCase(), type);
-						}
+					case "date":
+						break;
+
+					case "vocabulary":
+						break;
+					case "geometry":
 						break;
 					default:
-						
-						builder.set(attribute.toUpperCase(), source.getAttribute(attribute));
+						break;
 					}
+
+					/*
+					 * switch (attribute) { case "STATUS": String status =
+					 * (String) source.getAttribute("TENSTATUS"); if
+					 * (statusMapping.containsKey(status)) {
+					 * builder.set(attribute.toUpperCase(),
+					 * statusMapping.get(status)); } break; case "TYPE": String
+					 * type = (String) source.getAttribute(attribute);
+					 * 
+					 * if (typeMapping.containsKey(type)) {
+					 * builder.set(attribute.toUpperCase(),
+					 * typeMapping.get(type)); } else {
+					 * builder.set(attribute.toUpperCase(), type); } break;
+					 * default:
+					 * 
+					 * builder.set(attribute.toUpperCase(),
+					 * source.getAttribute(attribute)); }
+					 */
 
 				}
 				builder.set("GEOM", source.getDefaultGeometry());
@@ -201,31 +214,31 @@ public class ShapefileReader {
 		TenementMapping typeMapping = new TenementMapping(classLoader.getResource(mappingFilename).getFile());
 		tenementMapping = typeMapping.getMapping();
 	}
-	
-	 
-	
-//	public void setTypeMapping(String state) throws SAXException, IOException, ParserConfigurationException {
-//		System.out.println("TYPE MAPPING");
-//		typeMapping = retrieveMapping(typeMappingFilename, state);
-//		System.out.println(typeMapping);
-//	}
-//
-//	public void setStatusMapping(String state) throws SAXException, IOException, ParserConfigurationException {
-//		statusMapping = retrieveMapping(statusMappingFilename, state);
-//	}
 
-//	public Map<String, String> retrieveMapping(String filename, String state)
-//			throws SAXException, IOException, ParserConfigurationException {
-//		ClassLoader classLoader = ShapefileReader.class.getClassLoader();
-//		URL path = classLoader.getResource(filename);
-//		TenementMapping typeMapping = new TenementMapping(path.getFile());
-//		System.out.println(path);
-//		Map<String, Map<?, ?>> map = typeMapping.getMapping();
-//		Map<String, String> stateMapping = (Map<String, String>) map.get(state);
-//		System.out.println(state);
-//		return stateMapping;
-//
-//	}
+	// public void setTypeMapping(String state) throws SAXException,
+	// IOException, ParserConfigurationException {
+	// System.out.println("TYPE MAPPING");
+	// typeMapping = retrieveMapping(typeMappingFilename, state);
+	// System.out.println(typeMapping);
+	// }
+	//
+	// public void setStatusMapping(String state) throws SAXException,
+	// IOException, ParserConfigurationException {
+	// statusMapping = retrieveMapping(statusMappingFilename, state);
+	// }
+
+	// public Map<String, String> retrieveMapping(String filename, String state)
+	// throws SAXException, IOException, ParserConfigurationException {
+	// ClassLoader classLoader = ShapefileReader.class.getClassLoader();
+	// URL path = classLoader.getResource(filename);
+	// TenementMapping typeMapping = new TenementMapping(path.getFile());
+	// System.out.println(path);
+	// Map<String, Map<?, ?>> map = typeMapping.getMapping();
+	// Map<String, String> stateMapping = (Map<String, String>) map.get(state);
+	// System.out.println(state);
+	// return stateMapping;
+	//
+	// }
 
 	/**
 	 * @param date
