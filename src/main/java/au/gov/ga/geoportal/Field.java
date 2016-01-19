@@ -6,6 +6,7 @@ public class Field {
 
 	private String source;
 	private String type;
+	private String format =null;
 	private String target;
 	private List<Mapping> mappings;
 
@@ -41,9 +42,20 @@ public class Field {
 		this.mappings = mappings;
 	}
 
+	public String getFormat() {
+		return format;
+	}
+
+	public void setFormat(String format) {
+		this.format = format;
+	}
+
 	@Override
 	public String toString() {
-		return "Field [source=" + source + ", type=" + type + ", target=" + target + ", mappings=" + mappings + "]";
+		return "Field [source=" + source + ", type=" + type + ", format=" + format + ", target=" + target
+				+ ", mappings=" + mappings + "]";
 	}
+
+	
 
 }
