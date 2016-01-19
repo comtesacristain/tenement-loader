@@ -16,13 +16,8 @@
 			</mapping>
 		</mappings>
 	</field>
-	<field target="owner">
-		<source>OWNER</source>
-		<type>string</type>
-	</field>
-	<field target="status">
-		<source>TENSTATUS</source>
-		<type>vocabulary</type>
+	<field target="owner" source="OWNER" type="string" />
+	<field target="status" source="TENSTATUS" type="vocabulary">
 		<mappings>
 			<mapping>
 				<source>LIVE</source>
@@ -34,24 +29,11 @@
 			</mapping>
 		</mappings>
 	</field>
-	<field target="area">
-		<source>AREA</source>
-		<type>string</type>
-	</field>
-	<field target="applicationDate">
-		<source>APPDATE</source>
-		<type format="yyyyMMdd">date</type>
-	</field>
-	<field target="grantDate">
-		<source>GRANTDATE</source>
-		<type format="yyyyMMdd">date</type>
-	</field>
-	<field target="expireDate">
-		<source>EXPIREDATE</source>
-		<type format="yyyyMMdd">date</type>
-	</field>
-	<field target="shape">
-		<source>the_geom</source>
-		<type>geometry</type>
-	</field>
+	<field target="area" source="AREA" type="string" />
+	<field target="applicationDate" source="APPDATE" type="date"
+		format="yyyyMMdd" />
+	<field target="grantDate" source="GRANTDATE" type="date" format="yyyyMMdd" />
+	<field target="expireDate" source="EXPIREDATE" type="date"
+		format="yyyyMMdd" />
+	<field target="geom" source="the_geom" type="geometry" />
 </tenement-mapping>
