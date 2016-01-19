@@ -180,9 +180,6 @@ public class ShapefileReader {
 						break;
 					case "date":
 						if (attributeValue instanceof Date) {
-							LocalDate date = Instant.ofEpochMilli(((Date) attributeValue).getTime())
-									.atZone(ZoneId.systemDefault()).toLocalDate();
-
 							builder.set(attribute.toUpperCase(), attributeValue);
 						} else if (attributeValue instanceof String) {
 							String dateString = (String) attributeValue;
