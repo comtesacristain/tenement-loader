@@ -194,6 +194,8 @@ public class ShapefileReader {
 							String mappedValue = mapping.get(attributeValue);
 							System.out.println(mappedValue);
 							builder.set(attribute.toUpperCase(), mappedValue);
+						} else {
+							builder.set(attribute.toUpperCase(), attributeValue);
 						}
 						break;
 					case "geometry":
