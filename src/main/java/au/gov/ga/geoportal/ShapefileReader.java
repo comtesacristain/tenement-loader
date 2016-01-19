@@ -3,9 +3,12 @@ package au.gov.ga.geoportal;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.YearMonth;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -63,7 +66,7 @@ public class ShapefileReader {
 	 *
 	 */
 	public enum States {
-		NSW , NT, QLD
+		NSW, NT, QLD
 	}
 
 	/**
@@ -176,23 +179,29 @@ public class ShapefileReader {
 						builder.set(attribute.toUpperCase(), attributeValue);
 						break;
 					case "date":
-						String dateString = (String) attributeValue;
-						if (!dateString.isEmpty()) {
+						if (attributeValue instanceof Date) {
+							LocalDate date = Instant.ofEpochMilli(((Date) attributeValue).getTime())
+									.atZone(ZoneId.systemDefault()).toLocalDate();
 
-							String dateFormatString = attributeMapping.getFormat();
+							builder.set(attribute.toUpperCase(), attributeValue);
+						} else if (attributeValue instanceof String) {
+							String dateString = (String) attributeValue;
+							System.out.println(dateString);
+							if (!dateString.isEmpty() && !dateString.equals("No Date Available")) {
 
-							DateTimeFormatter formatter = DateTimeFormatter.ofPattern(dateFormatString);
-							LocalDate date = LocalDate.parse(dateString, formatter);
-							builder.set(attribute.toUpperCase(), date.format(DateTimeFormatter.ISO_DATE));
+								String dateFormatString = attributeMapping.getFormat();
+
+								DateTimeFormatter formatter = DateTimeFormatter.ofPattern(dateFormatString);
+								LocalDate date = LocalDate.parse(dateString, formatter);
+								builder.set(attribute.toUpperCase(), date.format(DateTimeFormatter.ISO_DATE));
+							}
 						}
 						break;
 
 					case "vocabulary":
-						System.out.println(attributeValue);
 						Map<String, String> mapping = attributeMapping.getMappings();
 						if (mapping.containsKey(attributeValue)) {
 							String mappedValue = mapping.get(attributeValue);
-							System.out.println(mappedValue);
 							builder.set(attribute.toUpperCase(), mappedValue);
 						} else {
 							builder.set(attribute.toUpperCase(), attributeValue);
@@ -208,8 +217,6 @@ public class ShapefileReader {
 					default:
 						break;
 					}
-
-
 
 				}
 
