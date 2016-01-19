@@ -3,16 +3,16 @@
 	<field target="tenementType" source="TYPE" type="vocabulary">
 		<mappings>
 			<mapping>
-				<source>Assessment lease</source>
-				<target>assessment lease</target>
-			</mapping>
-			<mapping>
-				<source>Exploration licence</source>
-				<target>exploration licence</target>
-			</mapping>
-			<mapping>
-				<source>Mining lease</source>
+				<source>ML</source>
 				<target>mining lease</target>
+			</mapping>
+			<mapping>
+				<source>EPC</source>
+				<target>exploration permit for coal</target>
+			</mapping>
+			<mapping>
+				<source>EPM</source>
+				<target>exploration permit for minerals</target>
 			</mapping>
 		</mappings>
 	</field>
@@ -20,20 +20,20 @@
 	<field target="status" source="TENSTATUS" type="vocabulary">
 		<mappings>
 			<mapping>
-				<source>LIVE</source>
-				<target>live</target>
+				<source>Granted</source>
+				<target>granted</target>
 			</mapping>
 			<mapping>
-				<source>PENDING</source>
-				<target>pending</target>
+				<source>Application</source>
+				<target>application</target>
 			</mapping>
 		</mappings>
 	</field>
 	<field target="area" source="AREA" type="string" />
 	<field target="applicationDate" source="APPDATE" type="date"
-		format="yyyyMMdd" />
-	<field target="grantDate" source="GRANTDATE" type="date" format="yyyyMMdd" />
+		format="yyyy-MM-dd" />
+	<field target="grantDate" source="GRANTDATE" type="date" format="yyyy-MM-dd" />
 	<field target="expireDate" source="EXPIREDATE" type="date"
-		format="yyyyMMdd" />
+		format="yyyy-MM-dd" />
 	<field target="geom" source="the_geom" type="geometry" />
 </tenement-mapping>
