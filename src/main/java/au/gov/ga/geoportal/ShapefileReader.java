@@ -2,10 +2,7 @@ package au.gov.ga.geoportal;
 
 import java.io.File;
 import java.io.IOException;
-
 import java.io.InputStream;
-import java.io.Serializable;
-import java.net.URL;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
@@ -29,11 +26,16 @@ import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.filter.text.cql2.CQL;
 import org.geotools.filter.text.cql2.CQLException;
+import org.geotools.geometry.jts.JTS;
+import org.geotools.referencing.CRS;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
-import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.filter.Filter;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.operation.MathTransform;
 import org.xml.sax.SAXException;
+
+import com.vividsolutions.jts.geom.Geometry;
 
 /**
  * @author michael
@@ -61,16 +63,14 @@ public class ShapefileReader {
 	 *
 	 */
 	public enum States {
-		NSW, NT, QLD
+		NSW , NT, QLD
 	}
 
 	/**
 	 * @param args
-	 * @throws ParserConfigurationException
-	 * @throws IOException
-	 * @throws SAXException
+	 * @throws Exception
 	 */
-	public static void main(String[] args) throws SAXException, IOException, ParserConfigurationException {
+	public static void main(String[] args) throws Exception {
 
 		for (States state : States.values()) {
 			File shapefile = findShapefilePath(LocalDate.now(), state);
@@ -118,9 +118,9 @@ public class ShapefileReader {
 		return oracleDataStore;
 	}
 
-	public void loadToOracle() throws IOException, CQLException {
+	public void loadToOracle() throws Exception {
 		if (dataExists()) {
-			System.out.println("Hello there is already data for " + shapefilePrefix());
+			System.out.println("There is already data for " + shapefilePrefix());
 
 		} else {
 
@@ -135,6 +135,12 @@ public class ShapefileReader {
 
 			DataStore shapefileDataStore = DataStoreFinder.getDataStore(shapefileParamsMap);
 			String shapefileTypeName = shapefileDataStore.getTypeNames()[0];
+
+			CoordinateReferenceSystem tenementCRS = shapefileDataStore.getSchema(shapefileTypeName)
+					.getCoordinateReferenceSystem();
+			CoordinateReferenceSystem targetCRS = CRS.decode("EPSG:4283");
+
+			MathTransform coordinateSystemTransform = CRS.findMathTransform(tenementCRS, targetCRS, true);
 
 			SimpleFeatureBuilder builder = new SimpleFeatureBuilder(tenementsSchema);
 
@@ -152,52 +158,61 @@ public class ShapefileReader {
 			oracleFeatureStore.setTransaction(transaction);
 
 			while (shapefileFeatures.hasNext()) {
+
 				SimpleFeature source = (SimpleFeature) shapefileFeatures.next();
 
-				for (AttributeDescriptor attributeDescriptor : tenementsSchema.getAttributeDescriptors()) {
+				for (String attribute : tenementMapping.keySet()) {
 
-					String attribute = attributeDescriptor.getLocalName();
+					// String attribute = attributeDescriptor.getLocalName();
 
 					Field attributeMapping = tenementMapping.get(attribute);
 
 					String attributeType = attributeMapping.getType();
 
+					Object attributeValue = source.getAttribute(attributeMapping.getSource());
+
 					switch (attributeType) {
 					case "string":
-						builder.set(attribute.toUpperCase(), source.getAttribute(attributeMapping.getSource()));
+						builder.set(attribute.toUpperCase(), attributeValue);
 						break;
 					case "date":
+						String dateString = (String) attributeValue;
+						if (!dateString.isEmpty()) {
+
+							String dateFormatString = attributeMapping.getFormat();
+
+							DateTimeFormatter formatter = DateTimeFormatter.ofPattern(dateFormatString);
+							LocalDate date = LocalDate.parse(dateString, formatter);
+							builder.set(attribute.toUpperCase(), date.format(DateTimeFormatter.ISO_DATE));
+						}
 						break;
 
 					case "vocabulary":
+						System.out.println(attributeValue);
+						Map<String, String> mapping = attributeMapping.getMappings();
+						if (mapping.containsKey(attributeValue)) {
+							String mappedValue = mapping.get(attributeValue);
+							System.out.println(mappedValue);
+							builder.set(attribute.toUpperCase(), mappedValue);
+						}
 						break;
 					case "geometry":
+						Geometry sourceGeometry = (Geometry) source.getDefaultGeometry();
+						Geometry targetGeometry = JTS.transform(sourceGeometry, coordinateSystemTransform);
+						int srid = CRS.lookupEpsgCode(targetCRS, true);
+						targetGeometry.setSRID(srid);
+						builder.set(attribute.toUpperCase(), targetGeometry);
 						break;
 					default:
 						break;
 					}
 
-					/*
-					 * switch (attribute) { case "STATUS": String status =
-					 * (String) source.getAttribute("TENSTATUS"); if
-					 * (statusMapping.containsKey(status)) {
-					 * builder.set(attribute.toUpperCase(),
-					 * statusMapping.get(status)); } break; case "TYPE": String
-					 * type = (String) source.getAttribute(attribute);
-					 * 
-					 * if (typeMapping.containsKey(type)) {
-					 * builder.set(attribute.toUpperCase(),
-					 * typeMapping.get(type)); } else {
-					 * builder.set(attribute.toUpperCase(), type); } break;
-					 * default:
-					 * 
-					 * builder.set(attribute.toUpperCase(),
-					 * source.getAttribute(attribute)); }
-					 */
+
 
 				}
-				builder.set("GEOM", source.getDefaultGeometry());
+
 				builder.set("STATE", state());
+				builder.set("ACTIVITY_CODE", "A");
 				builder.set("RECORDDATE", shapefileDate().format(DateTimeFormatter.ISO_DATE));
 				oracleFeatureStore.addFeatures(DataUtilities.collection(builder.buildFeature(null)));
 			}
@@ -209,36 +224,13 @@ public class ShapefileReader {
 
 	public void setTenementMapping() throws SAXException, IOException, ParserConfigurationException {
 		String state = state();
-		String mappingFilename = state + partialMappingFilename.toUpperCase();
+		String mappingFilename = state + partialMappingFilename;
+
 		ClassLoader classLoader = ShapefileReader.class.getClassLoader();
 		TenementMapping typeMapping = new TenementMapping(classLoader.getResource(mappingFilename).getFile());
 		tenementMapping = typeMapping.getMapping();
+
 	}
-
-	// public void setTypeMapping(String state) throws SAXException,
-	// IOException, ParserConfigurationException {
-	// System.out.println("TYPE MAPPING");
-	// typeMapping = retrieveMapping(typeMappingFilename, state);
-	// System.out.println(typeMapping);
-	// }
-	//
-	// public void setStatusMapping(String state) throws SAXException,
-	// IOException, ParserConfigurationException {
-	// statusMapping = retrieveMapping(statusMappingFilename, state);
-	// }
-
-	// public Map<String, String> retrieveMapping(String filename, String state)
-	// throws SAXException, IOException, ParserConfigurationException {
-	// ClassLoader classLoader = ShapefileReader.class.getClassLoader();
-	// URL path = classLoader.getResource(filename);
-	// TenementMapping typeMapping = new TenementMapping(path.getFile());
-	// System.out.println(path);
-	// Map<String, Map<?, ?>> map = typeMapping.getMapping();
-	// Map<String, String> stateMapping = (Map<String, String>) map.get(state);
-	// System.out.println(state);
-	// return stateMapping;
-	//
-	// }
 
 	/**
 	 * @param date
