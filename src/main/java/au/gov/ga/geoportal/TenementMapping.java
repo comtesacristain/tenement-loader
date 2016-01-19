@@ -96,7 +96,10 @@ public class TenementMapping {
 				Element fieldElement = (Element) fieldNode;
 				field.setSource(fieldElement.getAttribute("source"));
 				field.setTarget(fieldElement.getAttribute("target"));
-				field.setTarget(fieldElement.getAttribute("type"));
+				field.setType(fieldElement.getAttribute("type"));
+				if (fieldElement.getAttribute("type") == "date") {
+					field.setFormat(fieldElement.getAttribute("format"));
+				}
 
 				NodeList mappings = fieldElement.getElementsByTagName("mapping");
 				if (mappings.getLength() > 0) {
