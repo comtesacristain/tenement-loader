@@ -25,7 +25,7 @@
 			</mapping>
 		</mappings>
 	</field>
-	<field target="area" source="AREA" type="string" />
+	<field target="area" source="AREANEW" type="string" />
 	<field target="applicationDate" source="APPDATE" type="date"
 		format="yyyy-MM-dd" />
 	<field target="grantDate" source="GRANTDATE" type="date" format="yyyy-MM-dd" />
