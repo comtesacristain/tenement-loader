@@ -49,6 +49,7 @@ public class ShapefileReader {
 
 	private Map<String, Field> tenementMapping;
 
+	private DataStore oracleDataStore;
 	/**
 	 * 
 	 */
@@ -100,6 +101,7 @@ public class ShapefileReader {
 		this.shapefile = shapefile;
 		try {
 			setTenementMapping();
+			setOracleDataStore();
 		} catch (SAXException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -113,21 +115,22 @@ public class ShapefileReader {
 
 	}
 
-	private DataStore oracleDataStore() throws IOException {
+	private void setOracleDataStore() throws IOException {
 		Properties params = oracleParams();
 		DataStore oracleDataStore = DataStoreFinder.getDataStore(params);
-		return oracleDataStore;
+		this.oracleDataStore = oracleDataStore;
 	}
 
 	public void loadToOracle() throws Exception {
+		
 		if (dataExists()) {
 			System.out.println("There is already data for " + shapefilePrefix());
 
 		} else {
 
-			SimpleFeatureType tenementsSchema = oracleDataStore().getSchema("TENEMENTS");
+			SimpleFeatureType tenementsSchema = oracleDataStore.getSchema("TENEMENTS");
 
-			SimpleFeatureSource oracleFeatureSource = oracleDataStore()
+			SimpleFeatureSource oracleFeatureSource = oracleDataStore
 					.getFeatureSource(tenementsSchema.getName().getLocalPart());
 			Transaction transaction = new DefaultTransaction("create");
 
@@ -181,7 +184,7 @@ public class ShapefileReader {
 							builder.set(attribute.toUpperCase(), attributeValue);
 						} else if (attributeValue instanceof String) {
 							String dateString = (String) attributeValue;
-							
+
 							if (!dateString.isEmpty() && !dateString.equals("No Date Available")) {
 
 								String dateFormatString = attributeMapping.getFormat();
@@ -203,11 +206,17 @@ public class ShapefileReader {
 						}
 						break;
 					case "geometry":
+
 						Geometry sourceGeometry = (Geometry) source.getDefaultGeometry();
-						Geometry targetGeometry = JTS.transform(sourceGeometry, coordinateSystemTransform);
-						int srid = CRS.lookupEpsgCode(targetCRS, true);
-						targetGeometry.setSRID(srid);
-						builder.set(attribute.toUpperCase(), targetGeometry);
+						if (sourceGeometry != null) {
+							Geometry targetGeometry = JTS.transform(sourceGeometry, coordinateSystemTransform);
+							int srid = CRS.lookupEpsgCode(targetCRS, true);
+							targetGeometry.setSRID(srid);
+							builder.set(attribute.toUpperCase(), targetGeometry);
+						}
+						break;
+					case "uri":
+						builder.set(attribute.toUpperCase(), tenementMapping.get(attribute).getURI());
 						break;
 					default:
 						break;
@@ -221,6 +230,8 @@ public class ShapefileReader {
 				oracleFeatureStore.addFeatures(DataUtilities.collection(builder.buildFeature(null)));
 			}
 			transaction.commit();
+			//oracleDataStore.dispose();
+			//shapefileDataStore.dispose();
 			transaction.close();
 		}
 
@@ -281,16 +292,13 @@ public class ShapefileReader {
 
 		String state = state();
 		LocalDate date = shapefileDate();
-		SimpleFeatureType tenementsSchema = oracleDataStore().getSchema("TENEMENTS");
-		SimpleFeatureSource oracleFeatureSource = oracleDataStore()
+		SimpleFeatureType tenementsSchema = oracleDataStore.getSchema("TENEMENTS");
+		SimpleFeatureSource oracleFeatureSource = oracleDataStore
 				.getFeatureSource(tenementsSchema.getName().getLocalPart());
 
-		// Filter stateFilter = CQL.toFilter("STATE = '" + state + "'");
-		// Filter dateFilter = CQL.toFilter("RECORDDATE = '" +
-		// date.format(formatter) + "'");
 
 		Filter filter = CQL.toFilter("STATE = '" + state + "' AND RECORDDATE = '" + date + "'");
-		// Query query = new Query(tenementsTypeName, filter);
+
 		SimpleFeatureCollection features = oracleFeatureSource.getFeatures(filter);
 		if (features.features().hasNext()) {
 			return true;
