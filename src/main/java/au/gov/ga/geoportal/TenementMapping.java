@@ -57,7 +57,11 @@ public class TenementMapping {
 					field.setFormat(fieldElement.getAttribute("format"));
 
 				}
-
+				
+				if (fieldElement.getAttribute("type").equals("uri")) {
+					field.setURI(fieldElement.getAttribute("uri"));
+				}
+				
 				NodeList mappings = fieldElement.getElementsByTagName("mapping");
 
 				if (mappings.getLength() > 0) {
