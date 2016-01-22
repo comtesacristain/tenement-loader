@@ -6,11 +6,16 @@ public class Field {
 
 	private String source;
 	private String type;
-	private String format =null;
+	private String format = null;
+	private String URI;
 	private String target;
 
-
 	private Map<String, String> mappings;
+
+	public String getURI() {
+		return URI;
+	}
+	
 	
 	public String getSource() {
 		return source;
@@ -58,6 +63,9 @@ public class Field {
 				+ ", mappings=" + mappings + "]";
 	}
 
-	
+	public void setURI(String URI) {
+		this.URI = URI;
+
+	}
 
 }
