@@ -24,4 +24,5 @@
 	<field target="expireDate" source="EXPIREDATE" type="date"
 		format="dd/MM/yyyy" />
 	<field target="geom" source="the_geom" type="geometry" />
+	<field target="jurisdiction_uri" type="uri" uri="http://www.nt.gov.au/d/Minerals_Energy/index.cfm?header=Mineral+Titles+Forms+and+Guidelines#appforms" />
 </tenement-mapping>

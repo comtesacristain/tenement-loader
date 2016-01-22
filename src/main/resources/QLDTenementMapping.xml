@@ -36,4 +36,5 @@
 	<field target="expireDate" source="EXPIREDATE" type="date"
 		format="yyyy-MM-dd" />
 	<field target="geom" source="the_geom" type="geometry" />
+	<field target="jurisdiction_uri" type="uri" uri="https://www.business.qld.gov.au/industry/mining/mining-online-services" />
 </tenement-mapping>

@@ -36,4 +36,6 @@
 	<field target="expireDate" source="EXPIREDATE" type="date"
 		format="yyyyMMdd" />
 	<field target="geom" source="the_geom" type="geometry" />
+	<field target="jurisdiction_uri" type="uri" uri="http://www.resourcesandenergy.nsw.gov.au/miners-and-explorers/applications-and-approvals/current-titles-reports-applications-and-services" />
+
 </tenement-mapping>

@@ -32,4 +32,5 @@
 	<field target="expireDate" source="EXPIREDATE" type="date"
 		format="yyyy-MM-dd" />
 	<field target="geom" source="the_geom" type="geometry" />
+	<field target="jurisdiction_uri" type="uri" uri="http://minerals.statedevelopment.sa.gov.au/" />
 </tenement-mapping>
