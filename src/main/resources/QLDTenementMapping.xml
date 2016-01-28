@@ -1,6 +1,16 @@
 <tenement-mapping state="QLD">
 	<field target="name" source="TENID" type="string" />
-	<field target="tenementType" source="TYPE" type="vocabulary">
+	<field target="tenementType" source="TYPE" type="string" />
+	<field target="owner" source="OWNER" type="string" />
+	<field target="status" source="TENSTATUS" type="string" />
+	<field target="area" source="AREA" type="string" />
+	<field target="applicationDate" source="APPDATE" type="date"
+		format="yyyy-MM-dd" />
+	<field target="grantDate" source="GRANTDATE" type="date" format="yyyy-MM-dd" />
+	<field target="expireDate" source="EXPIREDATE" type="date"
+		format="yyyy-MM-dd" />
+	<field target="geom" source="the_geom" type="geometry" />
+	<field target="tenementType_uri" source="TYPE" type="uri">
 		<mappings>
 			<mapping>
 				<source>ML</source>
@@ -16,8 +26,7 @@
 			</mapping>
 		</mappings>
 	</field>
-	<field target="owner" source="OWNER" type="string" />
-	<field target="status" source="TENSTATUS" type="vocabulary">
+	<field target="status_uri" source="TENSTATUS" type="uri">
 		<mappings>
 			<mapping>
 				<source>Granted</source>
@@ -29,12 +38,5 @@
 			</mapping>
 		</mappings>
 	</field>
-	<field target="area" source="AREA" type="string" />
-	<field target="applicationDate" source="APPDATE" type="date"
-		format="yyyy-MM-dd" />
-	<field target="grantDate" source="GRANTDATE" type="date" format="yyyy-MM-dd" />
-	<field target="expireDate" source="EXPIREDATE" type="date"
-		format="yyyy-MM-dd" />
-	<field target="geom" source="the_geom" type="geometry" />
 	<field target="jurisdiction_uri" type="uri" uri="https://www.business.qld.gov.au/industry/mining/mining-online-services" />
 </tenement-mapping>

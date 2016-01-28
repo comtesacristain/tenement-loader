@@ -1,22 +1,8 @@
 <tenement-mapping state="NT">
 	<field target="name" source="TENID" type="string" />
-	<field target="tenementType" source="TYPE" type="vocabulary">
-		<mappings>
-			<mapping>
-				<source>EL</source>
-				<target>exploration licence</target>
-			</mapping>
-		</mappings>
-	</field>
+	<field target="tenementType" source="TYPE" type="string" />
 	<field target="owner" source="OWNER" type="string" />
-	<field target="status" source="TENSTATUS" type="vocabulary">
-		<mappings>
-			<mapping>
-				<source>grant</source>
-				<target>granted</target>
-			</mapping>		
-		</mappings>
-	</field>
+	<field target="status" source="TENSTATUS" type="string" />
 	<field target="area" source="AREA" type="string" />
 	<field target="applicationDate" source="APPDATE" type="date"
 		format="dd/MM/yyyy" />
@@ -24,5 +10,22 @@
 	<field target="expireDate" source="EXPIREDATE" type="date"
 		format="dd/MM/yyyy" />
 	<field target="geom" source="the_geom" type="geometry" />
-	<field target="jurisdiction_uri" type="uri" uri="http://www.nt.gov.au/d/Minerals_Energy/index.cfm?header=Mineral+Titles+Forms+and+Guidelines#appforms" />
+	<field target="tenementType_uri" source="TYPE" type="uri">
+		<mappings>
+			<mapping>
+				<source>EL</source>
+				<target>exploration licence</target>
+			</mapping>
+		</mappings>
+	</field>
+	<field target="status_uri" source="TENSTATUS" type="uri">
+		<mappings>
+			<mapping>
+				<source>grant</source>
+				<target>granted</target>
+			</mapping>
+		</mappings>
+	</field>
+	<field target="jurisdiction_uri" type="uri"
+		uri="http://www.nt.gov.au/d/Minerals_Energy/index.cfm?header=Mineral+Titles+Forms+and+Guidelines#appforms" />
 </tenement-mapping>

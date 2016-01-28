@@ -1,6 +1,15 @@
 <tenement-mapping state="NSW">
 	<field target="name" source="TENID" type="string" />
-	<field target="tenementType" source="TYPE" type="vocabulary">
+	<field target="tenementType" source="TYPE" type="string" />
+	<field target="owner" source="OWNER" type="string" />
+	<field target="status" source="TENSTATUS" type="string" />
+	<field target="area" source="AREA" type="string" />
+	<field target="applicationDate" source="APPDATE" type="date"
+		format="yyyyMMdd" />
+	<field target="grantDate" source="GRANTDATE" type="date" format="yyyyMMdd" />
+	<field target="expireDate" source="EXPIREDATE" type="date"
+		format="yyyyMMdd" />
+	<field target="tenementType_uri" source="TYPE" type="uri" uri="http://resource.geoscience.gov.au/classifier/ggic/tenementtype/">
 		<mappings>
 			<mapping>
 				<source>Assessment lease</source>
@@ -16,8 +25,7 @@
 			</mapping>
 		</mappings>
 	</field>
-	<field target="owner" source="OWNER" type="string" />
-	<field target="status" source="TENSTATUS" type="vocabulary">
+	<field target="status_uri" source="TENSTATUS" type="uri" uri="http://resource.geoscience.gov.au/classifier/ggic/tenement-status/">
 		<mappings>
 			<mapping>
 				<source>LIVE</source>
@@ -29,13 +37,7 @@
 			</mapping>
 		</mappings>
 	</field>
-	<field target="area" source="AREA" type="string" />
-	<field target="applicationDate" source="APPDATE" type="date"
-		format="yyyyMMdd" />
-	<field target="grantDate" source="GRANTDATE" type="date" format="yyyyMMdd" />
-	<field target="expireDate" source="EXPIREDATE" type="date"
-		format="yyyyMMdd" />
+	<field target="jurisdiction_uri" type="uri"
+		uri="http://www.resourcesandenergy.nsw.gov.au/miners-and-explorers/applications-and-approvals/current-titles-reports-applications-and-services" />
 	<field target="geom" source="the_geom" type="geometry" />
-	<field target="jurisdiction_uri" type="uri" uri="http://www.resourcesandenergy.nsw.gov.au/miners-and-explorers/applications-and-approvals/current-titles-reports-applications-and-services" />
-
 </tenement-mapping>
