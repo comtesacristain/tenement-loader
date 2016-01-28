@@ -122,7 +122,7 @@ public class ShapefileReader {
 	}
 
 	public void loadToOracle() throws Exception {
-		
+
 		if (dataExists()) {
 			System.out.println("There is already data for " + shapefilePrefix());
 
@@ -196,13 +196,19 @@ public class ShapefileReader {
 						}
 						break;
 
-					case "vocabulary":
+					case "uri":
 						Map<String, String> mapping = attributeMapping.getMappings();
-						if (mapping.containsKey(attributeValue)) {
-							String mappedValue = mapping.get(attributeValue);
-							builder.set(attribute.toUpperCase(), mappedValue);
+						String uri = tenementMapping.get(attribute).getURI();
+						if (attributeMapping.getSource() == null || mapping == null) {
+							
+							builder.set(attribute.toUpperCase(), uri);
 						} else {
-							builder.set(attribute.toUpperCase(), attributeValue);
+							if (mapping.containsKey(attributeValue)) {
+								String mappedValue = mapping.get(attributeValue).replace(" ", "-");
+								builder.set(attribute.toUpperCase(), uri+mappedValue);
+							} else {
+								builder.set(attribute.toUpperCase(), uri+attributeValue);
+							}
 						}
 						break;
 					case "geometry":
@@ -214,9 +220,6 @@ public class ShapefileReader {
 							targetGeometry.setSRID(srid);
 							builder.set(attribute.toUpperCase(), targetGeometry);
 						}
-						break;
-					case "uri":
-						builder.set(attribute.toUpperCase(), tenementMapping.get(attribute).getURI());
 						break;
 					default:
 						break;
@@ -230,8 +233,8 @@ public class ShapefileReader {
 				oracleFeatureStore.addFeatures(DataUtilities.collection(builder.buildFeature(null)));
 			}
 			transaction.commit();
-			//oracleDataStore.dispose();
-			//shapefileDataStore.dispose();
+			// oracleDataStore.dispose();
+			// shapefileDataStore.dispose();
 			transaction.close();
 		}
 
@@ -295,7 +298,6 @@ public class ShapefileReader {
 		SimpleFeatureType tenementsSchema = oracleDataStore.getSchema("TENEMENTS");
 		SimpleFeatureSource oracleFeatureSource = oracleDataStore
 				.getFeatureSource(tenementsSchema.getName().getLocalPart());
-
 
 		Filter filter = CQL.toFilter("STATE = '" + state + "' AND RECORDDATE = '" + date + "'");
 
