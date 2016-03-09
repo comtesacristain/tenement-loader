@@ -6,3 +6,4 @@ target
 *.dbf
 src/main/resources/persistence.properties
 src/main/resources/gispath.properties
+.settings/*
