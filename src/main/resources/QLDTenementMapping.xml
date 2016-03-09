@@ -10,7 +10,7 @@
 	<field target="expireDate" source="EXPIREDATE" type="date"
 		format="yyyy-MM-dd" />
 	<field target="geom" source="the_geom" type="geometry" />
-	<field target="tenementType_uri" source="TYPE" type="uri">
+	<field target="tenementType_uri" source="TYPE" type="uri" uri="http://resource.geoscience.gov.au/classifier/ggic/tenementtype/">
 		<mappings>
 			<mapping>
 				<source>ML</source>
@@ -26,7 +26,7 @@
 			</mapping>
 		</mappings>
 	</field>
-	<field target="status_uri" source="TENSTATUS" type="uri">
+	<field target="status_uri" source="TENSTATUS" type="uri" uri="http://resource.geoscience.gov.au/classifier/ggic/tenement-status/">
 		<mappings>
 			<mapping>
 				<source>Granted</source>
