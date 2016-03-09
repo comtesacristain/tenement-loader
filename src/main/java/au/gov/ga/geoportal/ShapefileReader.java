@@ -22,6 +22,7 @@ import org.geotools.data.Transaction;
 import org.geotools.data.simple.SimpleFeatureCollection;
 import org.geotools.data.simple.SimpleFeatureSource;
 import org.geotools.data.simple.SimpleFeatureStore;
+import org.geotools.factory.Hints;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
@@ -29,9 +30,11 @@ import org.geotools.filter.text.cql2.CQL;
 import org.geotools.filter.text.cql2.CQLException;
 import org.geotools.geometry.jts.JTS;
 import org.geotools.referencing.CRS;
+import org.geotools.referencing.ReferencingFactoryFinder;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.Filter;
+import org.opengis.referencing.crs.CRSAuthorityFactory;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
 import org.xml.sax.SAXException;
@@ -65,7 +68,7 @@ public class ShapefileReader {
 	 *
 	 */
 	public enum States {
-		NSW, NT, QLD
+		NSW //, QLD, SA // add more when necessary
 	}
 
 	/**
@@ -142,8 +145,11 @@ public class ShapefileReader {
 
 			CoordinateReferenceSystem tenementCRS = shapefileDataStore.getSchema(shapefileTypeName)
 					.getCoordinateReferenceSystem();
-			CoordinateReferenceSystem targetCRS = CRS.decode("EPSG:4283");
+			Hints hints = new Hints(Hints.FORCE_LONGITUDE_FIRST_AXIS_ORDER, Boolean.TRUE);
+			CRSAuthorityFactory factory = ReferencingFactoryFinder.getCRSAuthorityFactory("EPSG", hints);
+			CoordinateReferenceSystem targetCRS = factory.createCoordinateReferenceSystem("EPSG:4283");
 
+			
 			MathTransform coordinateSystemTransform = CRS.findMathTransform(tenementCRS, targetCRS, true);
 
 			SimpleFeatureBuilder builder = new SimpleFeatureBuilder(tenementsSchema);
@@ -200,14 +206,14 @@ public class ShapefileReader {
 						Map<String, String> mapping = attributeMapping.getMappings();
 						String uri = tenementMapping.get(attribute).getURI();
 						if (attributeMapping.getSource() == null || mapping == null) {
-							
+
 							builder.set(attribute.toUpperCase(), uri);
 						} else {
 							if (mapping.containsKey(attributeValue)) {
 								String mappedValue = mapping.get(attributeValue).replace(" ", "-");
-								builder.set(attribute.toUpperCase(), uri+mappedValue);
+								builder.set(attribute.toUpperCase(), uri + mappedValue);
 							} else {
-								builder.set(attribute.toUpperCase(), uri+attributeValue);
+								builder.set(attribute.toUpperCase(), uri + attributeValue);
 							}
 						}
 						break;
