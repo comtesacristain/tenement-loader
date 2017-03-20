@@ -1,4 +1,5 @@
 <tenement-mapping state="NSW">
+	
 	<field target="name" source="TENID" type="string" />
 	<field target="tenementType" source="TYPE" type="string" />
 	<field target="owner" source="OWNER" type="string" />
